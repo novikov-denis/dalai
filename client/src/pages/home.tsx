@@ -33,17 +33,10 @@ import { Toggle } from "@/components/ui/toggle";
 import { HistoryDialog } from "@/components/history-dialog";
 import { SettingsDialog } from "@/components/settings-dialog";
 
-// --- Mock Data & Types ---
+import { SuggestionCard, Suggestion } from "@/components/suggestion-card";
+import { MarkdownPreview } from "@/components/markdown-preview";
 
-type Suggestion = {
-  id: string;
-  original: string;
-  replacement: string;
-  reason: string;
-  type: "style" | "tone" | "grammar" | "policy";
-  status: "pending" | "accepted" | "rejected";
-  start_index: number; // Mock position
-};
+// --- Mock Data & Types ---
 
 const MOCK_SUGGESTIONS: Suggestion[] = [
   {
