@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
-  FileText, 
-  Sparkles, 
+  Feather, // Changed from FileText/Sparkles to Feather for literary feel
+  BookOpen,
   ArrowRight, 
   Check, 
   X, 
@@ -17,7 +17,8 @@ import {
   Minimize2,
   Eye,
   EyeOff,
-  CheckCheck
+  CheckCheck,
+  Library
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -27,6 +28,7 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
+import { Toggle } from "@/components/ui/toggle";
 
 import { HistoryDialog } from "@/components/history-dialog";
 import { SettingsDialog } from "@/components/settings-dialog";
@@ -47,8 +49,8 @@ const MOCK_SUGGESTIONS: Suggestion[] = [
   {
     id: "1",
     original: "Данный функционал позволяет пользователю",
-    replacement: "Эта функция помогает пользователю",
-    reason: "Канцелярит. Лучше использовать глаголы действия и простые конструкции.",
+    replacement: "Эта функция помогает читателю",
+    reason: "Канцелярит. Живая речь требует простых глаголов.",
     type: "style",
     status: "pending",
     start_index: 10
@@ -57,7 +59,7 @@ const MOCK_SUGGESTIONS: Suggestion[] = [
     id: "2",
     original: "Необходимо осуществить проверку",
     replacement: "Нужно проверить",
-    reason: "Отглагольное существительное. Утяжеляет текст.",
+    reason: "Сложное вместо простого. Отглагольные существительные утяжеляют слог.",
     type: "style",
     status: "pending",
     start_index: 45
@@ -65,8 +67,8 @@ const MOCK_SUGGESTIONS: Suggestion[] = [
   {
     id: "3",
     original: "Мы являемся лидерами рынка",
-    replacement: "Мы лидируем на рынке",
-    reason: "Штамп. Лучше показать факты, подтверждающие лидерство, или упростить фразу.",
+    replacement: "Мы лидируем",
+    reason: "Штамп. Лучше использовать сильный глагол.",
     type: "tone",
     status: "pending",
     start_index: 120
@@ -76,78 +78,32 @@ const MOCK_SUGGESTIONS: Suggestion[] = [
 // --- Components ---
 
 const Navigation = ({ onHistoryClick, onSettingsClick }: { onHistoryClick: () => void; onSettingsClick: () => void }) => (
-  <nav className="flex items-center justify-between px-8 py-6 border-b border-border/40 bg-white/50 backdrop-blur-sm sticky top-0 z-50">
-    <div className="flex items-center gap-3">
-      <div className="w-10 h-10 bg-primary text-white rounded-xl flex items-center justify-center shadow-lg shadow-primary/20">
-        <Sparkles className="w-6 h-6" />
+  <nav className="flex items-center justify-between px-8 py-5 border-b border-border/60 bg-[#FDFBF7]/80 backdrop-blur-md sticky top-0 z-50 shadow-sm">
+    <div className="flex items-center gap-4">
+      <div className="w-10 h-10 bg-primary text-primary-foreground rounded-lg flex items-center justify-center shadow-md shadow-primary/20">
+        <Feather className="w-6 h-6" />
       </div>
       <div>
-        <h1 className="text-xl font-serif font-bold leading-none">Реда AI</h1>
-        <span className="text-xs text-muted-foreground uppercase tracking-wider font-medium">Editor Pro</span>
+        <h1 className="text-2xl font-serif font-bold leading-none tracking-tight text-primary">Даль AI</h1>
+        <span className="text-[10px] text-primary/60 uppercase tracking-[0.2em] font-medium mt-0.5 block">Живое Слово</span>
       </div>
     </div>
-    <div className="flex items-center gap-4">
-      <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground" onClick={onHistoryClick}>
+    <div className="flex items-center gap-3">
+      <Button variant="ghost" size="sm" className="text-foreground/70 hover:text-primary font-medium hover:bg-primary/5" onClick={onHistoryClick}>
         <History className="w-4 h-4 mr-2" />
-        История
+        Архивъ
       </Button>
-      <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-foreground" onClick={onSettingsClick}>
+      <Button variant="ghost" size="icon" className="text-foreground/70 hover:text-primary hover:bg-primary/5" onClick={onSettingsClick}>
          <Menu className="w-5 h-5" />
       </Button>
-      <div className="h-8 w-[1px] bg-border" />
+      <div className="h-6 w-[1px] bg-border/80 mx-1" />
       <div className="flex items-center gap-2">
-        <div className="w-8 h-8 rounded-full bg-muted border border-border flex items-center justify-center text-xs font-medium text-muted-foreground">
-          US
+        <div className="w-8 h-8 rounded-full bg-accent/10 border border-accent/20 flex items-center justify-center text-xs font-bold text-accent font-serif">
+          В
         </div>
       </div>
     </div>
   </nav>
-);
-
-const EmptyState = ({ onStart }: { onStart: () => void }) => (
-  <motion.div 
-    initial={{ opacity: 0, y: 20 }}
-    animate={{ opacity: 1, y: 0 }}
-    className="flex flex-col items-center justify-center min-h-[60vh] text-center max-w-2xl mx-auto px-6"
-  >
-    <div className="mb-8 relative">
-      <div className="absolute inset-0 bg-primary/10 blur-3xl rounded-full" />
-      <FileText className="w-24 h-24 text-primary relative z-10 opacity-80" strokeWidth={1} />
-    </div>
-    <h2 className="text-4xl md:text-5xl font-serif font-bold mb-6 text-balance text-foreground">
-      Сделайте ваш текст <span className="text-primary italic">безупречным</span>
-    </h2>
-    <p className="text-lg text-muted-foreground mb-10 text-balance max-w-lg leading-relaxed">
-      Умная проверка текстов на соответствие редполитике Яндекс Практикума. 
-      Загрузите файл или начните писать прямо сейчас.
-    </p>
-    
-    <div className="flex flex-col sm:flex-row gap-4 w-full max-w-md">
-      <Button size="lg" className="w-full h-14 text-lg shadow-xl shadow-primary/10 hover:shadow-primary/20 transition-all" onClick={onStart}>
-        <FileText className="mr-2 w-5 h-5" />
-        Начать писать
-      </Button>
-      <Button size="lg" variant="outline" className="w-full h-14 text-lg bg-white/50 hover:bg-white transition-all">
-        <Upload className="mr-2 w-5 h-5" />
-        Загрузить файл
-      </Button>
-    </div>
-    
-    <div className="mt-12 grid grid-cols-3 gap-8 text-center w-full opacity-60">
-      <div>
-        <div className="text-2xl font-bold font-serif">12</div>
-        <div className="text-xs uppercase tracking-wider mt-1">Проверок тона</div>
-      </div>
-      <div>
-        <div className="text-2xl font-bold font-serif">24/7</div>
-        <div className="text-xs uppercase tracking-wider mt-1">Доступность</div>
-      </div>
-      <div>
-        <div className="text-2xl font-bold font-serif">0.5c</div>
-        <div className="text-xs uppercase tracking-wider mt-1">Скорость</div>
-      </div>
-    </div>
-  </motion.div>
 );
 
 const LoadingState = () => {
@@ -155,11 +111,11 @@ const LoadingState = () => {
   const [statusIndex, setStatusIndex] = useState(0);
   
   const statuses = [
-    "Анализирую структуру...",
-    "Проверяю на канцеляризмы...",
-    "Оцениваю тональность...",
-    "Ищу стоп-слова...",
-    "Формирую рекомендации..."
+    "Открываю словарь...",
+    "Сверяю с нормами речи...",
+    "Ищу канцеляризмы...",
+    "Подбираю синонимы...",
+    "Оцениваю благозвучие..."
   ];
 
   useEffect(() => {
@@ -181,24 +137,28 @@ const LoadingState = () => {
   }, []);
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-[60vh]">
-      <div className="w-full max-w-md space-y-8">
-        <div className="relative">
-          <div className="flex justify-between text-sm font-medium mb-2 text-muted-foreground uppercase tracking-wider">
-            <span className="animate-pulse text-primary">AI Analysis</span>
+    <div className="flex flex-col items-center justify-center min-h-[60vh] bg-background/50">
+      <div className="w-full max-w-md space-y-8 text-center">
+        <div className="mx-auto w-16 h-16 bg-primary/5 rounded-full flex items-center justify-center mb-4 animate-pulse">
+          <BookOpen className="w-8 h-8 text-primary" />
+        </div>
+        
+        <div className="relative px-10">
+          <div className="flex justify-between text-xs font-bold mb-3 text-primary/60 uppercase tracking-widest">
+            <span>Анализъ</span>
             <span>{progress}%</span>
           </div>
-          <Progress value={progress} className="h-1" />
+          <Progress value={progress} className="h-1.5 bg-primary/10" />
         </div>
         
         <div className="h-12 flex items-center justify-center">
           <AnimatePresence mode="wait">
             <motion.div
               key={statusIndex}
-              initial={{ opacity: 0, y: 10 }}
+              initial={{ opacity: 0, y: 5 }}
               animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              className="text-lg font-serif text-center text-foreground/80"
+              exit={{ opacity: 0, y: -5 }}
+              className="text-xl font-serif italic text-foreground/80"
             >
               {statuses[statusIndex]}
             </motion.div>
@@ -231,8 +191,8 @@ const Editor = ({ onBack }: { onBack: () => void }) => {
   const handleAccept = (id: string) => {
     setResults(prev => prev?.map(s => s.id === id ? { ...s, status: "accepted" } : s) || null);
     toast({
-      title: "Исправление принято",
-      description: "Текст обновлен автоматически.",
+      title: "Правка внесена",
+      description: "Текст стал чище.",
       duration: 2000,
     });
     setActiveSuggestionId(null);
@@ -259,7 +219,7 @@ const Editor = ({ onBack }: { onBack: () => void }) => {
     // Preview Mode: Show text as if all pending were accepted
     if (isPreviewMode) {
        return (
-        <div className="whitespace-pre-wrap leading-relaxed text-lg font-serif text-foreground/90">
+        <div className="whitespace-pre-wrap leading-relaxed text-lg font-body text-foreground/90">
           {results.map((s, i) => {
              // In preview mode, show replacement if pending or accepted. Show original only if rejected.
              const showReplacement = s.status === "accepted" || s.status === "pending";
@@ -271,27 +231,23 @@ const Editor = ({ onBack }: { onBack: () => void }) => {
     }
 
     return (
-      <div className="whitespace-pre-wrap leading-relaxed text-lg font-serif text-foreground/90">
+      <div className="whitespace-pre-wrap leading-relaxed text-lg font-body text-foreground/90">
         {results.map((s, i) => {
           if (s.status !== "pending") {
              // If accepted, show replacement. If rejected, show original.
-             return <span key={i} className={cn(s.status === "accepted" && "text-primary")}>{s.status === "accepted" ? s.replacement : s.original} </span>;
+             return <span key={i} className={cn(s.status === "accepted" && "text-primary font-medium bg-primary/5")}>{s.status === "accepted" ? s.replacement : s.original} </span>;
           }
           return (
             <span 
               key={s.id}
               className={cn(
-                "cursor-pointer border-b-2 transition-colors rounded px-0.5 relative group/text",
-                s.type === "style" ? "border-blue-300 hover:bg-blue-50" : "border-orange-300 hover:bg-orange-50",
-                activeSuggestionId === s.id && (s.type === "style" ? "bg-blue-100 border-blue-500" : "bg-orange-100 border-orange-500")
+                "cursor-pointer border-b-2 transition-all duration-200 rounded px-0.5 relative group/text pb-0.5",
+                s.type === "style" ? "border-accent/40 hover:bg-accent/10" : "border-primary/40 hover:bg-primary/10",
+                activeSuggestionId === s.id && (s.type === "style" ? "bg-accent/15 border-accent" : "bg-primary/15 border-primary")
               )}
               onClick={() => setActiveSuggestionId(s.id)}
             >
               {s.original}
-              {/* Tooltip on hover */}
-              <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-max max-w-[200px] bg-popover text-popover-foreground text-xs p-2 rounded shadow-lg opacity-0 group-hover/text:opacity-100 pointer-events-none transition-opacity z-50 border border-border">
-                 {s.reason}
-              </span>
             </span>
           );
         })}
@@ -306,21 +262,21 @@ const Editor = ({ onBack }: { onBack: () => void }) => {
     <div className="flex flex-col h-full">
       {/* Toolbar */}
       <motion.div 
-        className="flex items-center justify-between px-8 py-4 border-b border-border bg-white sticky top-[88px] z-40"
-        animate={{ opacity: isFocusMode ? 0 : 1, height: isFocusMode ? 0 : "auto", overflow: "hidden", padding: isFocusMode ? 0 : "1rem 2rem" }}
+        className="flex items-center justify-between px-8 py-3 border-b border-border/60 bg-white/80 backdrop-blur sticky top-[80px] z-40"
+        animate={{ opacity: isFocusMode ? 0 : 1, height: isFocusMode ? 0 : "auto", overflow: "hidden", padding: isFocusMode ? 0 : "0.75rem 2rem" }}
       >
         <div className="flex items-center gap-4">
-          <Button variant="ghost" size="icon" onClick={onBack}>
-            <RotateCcw className="w-4 h-4" />
-          </Button>
-          <div className="h-6 w-[1px] bg-border" />
-          <span className="text-sm font-medium text-muted-foreground">Черновик #12</span>
+           {/* Empty left space or breadcrumbs */}
+           <div className="flex items-center text-sm text-muted-foreground">
+              <Library className="w-4 h-4 mr-2 opacity-50" />
+              <span>Черновик от 21 ноября</span>
+           </div>
         </div>
         
         {!results ? (
-          <Button onClick={handleAnalyze} className="bg-black hover:bg-gray-800 text-white shadow-lg hover:shadow-xl transition-all">
-            <Sparkles className="w-4 h-4 mr-2" />
-            Проверить текст
+          <Button onClick={handleAnalyze} className="bg-primary hover:bg-primary/90 text-white shadow-lg shadow-primary/20 transition-all font-serif px-8">
+            <Feather className="w-4 h-4 mr-2" />
+            Проверить слог
           </Button>
         ) : (
           <div className="flex items-center gap-4">
@@ -328,24 +284,24 @@ const Editor = ({ onBack }: { onBack: () => void }) => {
                 <Button 
                   variant="ghost" 
                   size="sm" 
-                  className={cn(isPreviewMode && "bg-primary/10 text-primary")}
+                  className={cn("text-muted-foreground hover:text-primary", isPreviewMode && "bg-primary/10 text-primary")}
                   onClick={() => setIsPreviewMode(!isPreviewMode)}
                 >
                    {isPreviewMode ? <EyeOff className="w-4 h-4 mr-2" /> : <Eye className="w-4 h-4 mr-2" />}
-                   {isPreviewMode ? "Вернуть редактор" : "Предпросмотр"}
+                   {isPreviewMode ? "Редактировать" : "Читать"}
                 </Button>
              </div>
-            <div className="flex gap-4 text-sm mr-4">
-               <div className="flex items-center gap-2">
-                 <div className="w-2 h-2 rounded-full bg-red-500" />
-                 <span className="text-muted-foreground">3 ошибки</span>
+            <div className="flex gap-6 text-sm mr-4 font-medium">
+               <div className="flex items-center gap-2 text-destructive/80">
+                 <div className="w-1.5 h-1.5 rounded-full bg-destructive" />
+                 <span>3 ошибки</span>
                </div>
-               <div className="flex items-center gap-2">
-                 <div className="w-2 h-2 rounded-full bg-primary" />
-                 <span className="text-muted-foreground">2 улучшения</span>
+               <div className="flex items-center gap-2 text-accent">
+                 <div className="w-1.5 h-1.5 rounded-full bg-accent" />
+                 <span>2 совета</span>
                </div>
             </div>
-            <Button variant="outline" onClick={() => setResults(null)}>
+            <Button variant="outline" size="sm" onClick={() => setResults(null)} className="border-primary/20 text-primary hover:bg-primary/5">
               Сбросить
             </Button>
           </div>
@@ -353,14 +309,14 @@ const Editor = ({ onBack }: { onBack: () => void }) => {
       </motion.div>
 
       {/* Main Workspace */}
-      <div className="flex-1 flex overflow-hidden relative">
+      <div className="flex-1 flex overflow-hidden relative bg-[#FDFBF7]">
         
         {/* Floating Focus Toggle */}
         <div className="absolute top-4 right-8 z-50">
            <Button 
              variant="ghost" 
              size="icon" 
-             className="bg-white/50 backdrop-blur hover:bg-white shadow-sm"
+             className="bg-white/50 backdrop-blur hover:bg-white shadow-sm text-muted-foreground hover:text-foreground"
              onClick={() => setIsFocusMode(!isFocusMode)}
            >
              {isFocusMode ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
@@ -368,20 +324,20 @@ const Editor = ({ onBack }: { onBack: () => void }) => {
         </div>
 
         {/* Editor Area */}
-        <div className="flex-1 bg-background overflow-y-auto hide-scrollbar relative transition-all duration-500">
+        <div className="flex-1 overflow-y-auto hide-scrollbar relative transition-all duration-500">
           <motion.div 
-            className="max-w-3xl mx-auto py-12 px-12 min-h-full bg-white shadow-sm my-8 rounded-xl border border-border/50"
-            animate={{ maxWidth: isFocusMode ? "900px" : "48rem" }}
+            className="max-w-3xl mx-auto py-16 px-16 min-h-full bg-white shadow-sm border-x border-border/40 my-0"
+            animate={{ maxWidth: isFocusMode ? "800px" : "46rem" }}
           >
             {!results ? (
               <Textarea 
                 value={text}
                 onChange={(e) => setText(e.target.value)}
-                placeholder="Начните писать или вставьте текст здесь..."
-                className="w-full h-full min-h-[60vh] resize-none border-none focus-visible:ring-0 text-lg leading-relaxed font-serif p-0 placeholder:text-muted-foreground/50"
+                placeholder="Напишите здесь что-нибудь..."
+                className="w-full h-full min-h-[70vh] resize-none border-none focus-visible:ring-0 text-lg leading-relaxed font-body p-0 placeholder:text-muted-foreground/30 bg-transparent"
               />
             ) : (
-              <div className="min-h-[60vh]">
+              <div className="min-h-[70vh]">
                  {renderHighlightedText()}
               </div>
             )}
@@ -393,85 +349,85 @@ const Editor = ({ onBack }: { onBack: () => void }) => {
           {results && !isFocusMode && (
             <motion.div 
               initial={{ width: 0, opacity: 0 }}
-              animate={{ width: 400, opacity: 1 }}
+              animate={{ width: 380, opacity: 1 }}
               exit={{ width: 0, opacity: 0 }}
-              className="border-l border-border bg-muted/30 flex flex-col"
+              className="border-l border-border/60 bg-white/50 flex flex-col backdrop-blur-sm"
             >
-              <div className="p-6 border-b border-border/50 bg-white/50 backdrop-blur space-y-6">
+              <div className="p-6 border-b border-border/40 space-y-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <h3 className="font-serif font-bold text-lg">Рекомендации AI</h3>
-                    <p className="text-xs text-muted-foreground mt-1">Найдено 3 предложения</p>
+                    <h3 className="font-serif font-bold text-lg text-primary">Правки</h3>
+                    <p className="text-xs text-muted-foreground mt-1 font-medium uppercase tracking-wide">Найдено 3 замечания</p>
                   </div>
                   <div className="relative flex items-center justify-center w-12 h-12">
+                     {/* Circular Score */}
                      <svg className="w-full h-full -rotate-90" viewBox="0 0 36 36">
-                        <path className="text-muted/20" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" strokeWidth="3" />
-                        <path className="text-primary" strokeDasharray="75, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" strokeWidth="3" />
+                        <path className="text-border" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" strokeWidth="2" />
+                        <path className="text-accent" strokeDasharray="75, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
                      </svg>
-                     <span className="absolute text-xs font-bold">75</span>
+                     <span className="absolute text-sm font-serif font-bold text-primary">75</span>
                   </div>
                 </div>
                 
-                <Card className="p-4 bg-primary/5 border-primary/10 shadow-sm">
+                <Card className="p-4 bg-[#F0F4F8] border-none shadow-inner">
                    <div className="flex items-start gap-3">
-                      <Sparkles className="w-5 h-5 text-primary mt-0.5" />
+                      <BookOpen className="w-5 h-5 text-primary mt-0.5" />
                       <div>
-                        <h4 className="text-sm font-semibold text-foreground">Анализ тональности</h4>
-                        <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
-                          Текст написан в деловом стиле, но местами слишком формален. Рекомендуется упростить конструкции.
+                        <h4 className="text-sm font-bold text-foreground font-serif">Общий анализ</h4>
+                        <p className="text-xs text-muted-foreground mt-1 leading-relaxed font-medium">
+                          Текст написан в деловом стиле, но местами слишком формален. Рекомендуется упростить конструкции для живости слога.
                         </p>
                       </div>
                    </div>
                 </Card>
 
-                <Button variant="outline" className="w-full text-xs h-8" onClick={handleAcceptAll}>
+                <Button variant="outline" className="w-full text-xs h-9 border-primary/20 text-primary hover:bg-primary/5 font-medium uppercase tracking-wide" onClick={handleAcceptAll}>
                    <CheckCheck className="w-3 h-3 mr-2" />
-                   Принять все (3)
+                   Принять все правки
                 </Button>
               </div>
               
-              <ScrollArea className="flex-1 p-6">
+              <ScrollArea className="flex-1 p-6 bg-secondary/30">
                 <div className="space-y-4">
                   {results.filter(r => r.status === "pending").map((suggestion) => (
                     <motion.div 
                       key={suggestion.id}
                       layoutId={suggestion.id}
                       className={cn(
-                        "group relative bg-white rounded-xl border p-5 transition-all duration-200 hover:shadow-md cursor-pointer",
-                        activeSuggestionId === suggestion.id ? "border-primary ring-1 ring-primary shadow-md scale-[1.02]" : "border-border/60"
+                        "group relative bg-white rounded-lg border p-5 transition-all duration-200 hover:shadow-md cursor-pointer",
+                        activeSuggestionId === suggestion.id ? "border-accent ring-1 ring-accent shadow-md scale-[1.02]" : "border-border shadow-sm"
                       )}
                       onClick={() => setActiveSuggestionId(suggestion.id)}
                     >
                       <div className="flex items-center gap-2 mb-3">
                         <Badge variant="outline" className={cn(
-                          "text-[10px] px-2 py-0.5 h-5 uppercase tracking-wider font-semibold border-0",
-                          suggestion.type === "style" ? "bg-blue-50 text-blue-600" : "bg-orange-50 text-orange-600"
+                          "text-[10px] px-2 py-0.5 h-5 uppercase tracking-wider font-bold border-0 rounded-sm",
+                          suggestion.type === "style" ? "bg-accent/10 text-accent" : "bg-primary/10 text-primary"
                         )}>
                           {suggestion.type === "style" ? "Стиль" : "Тон"}
                         </Badge>
                       </div>
                       
                       <div className="space-y-3">
-                         <div className="line-through text-muted-foreground text-sm decoration-red-300/50">
+                         <div className="line-through text-muted-foreground/60 text-sm decoration-destructive/30 font-body">
                            {suggestion.original}
                          </div>
-                         <div className="text-base font-medium text-foreground flex items-start gap-2">
-                           <ArrowRight className="w-4 h-4 text-primary mt-1 shrink-0" />
+                         <div className="text-base font-bold text-foreground flex items-start gap-2 font-body">
+                           <ArrowRight className="w-4 h-4 text-accent mt-1 shrink-0" />
                            {suggestion.replacement}
                          </div>
                       </div>
                       
-                      <div className="mt-4 pt-3 border-t border-border/40">
-                        <p className="text-xs text-muted-foreground mb-3 leading-relaxed">
-                          <AlertCircle className="w-3 h-3 inline mr-1 opacity-70" />
-                          {suggestion.reason}
+                      <div className="mt-4 pt-3 border-t border-border/50">
+                        <p className="text-xs text-muted-foreground mb-4 leading-relaxed italic">
+                          "{suggestion.reason}"
                         </p>
                         
                         <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                          <Button size="sm" className="w-full h-8 text-xs bg-primary hover:bg-primary/90" onClick={(e) => { e.stopPropagation(); handleAccept(suggestion.id); }}>
+                          <Button size="sm" className="w-full h-8 text-xs bg-primary hover:bg-primary/90 text-white font-medium" onClick={(e) => { e.stopPropagation(); handleAccept(suggestion.id); }}>
                             <Check className="w-3 h-3 mr-1" /> Принять
                           </Button>
-                          <Button size="sm" variant="outline" className="w-full h-8 text-xs" onClick={(e) => { e.stopPropagation(); handleReject(suggestion.id); }}>
+                          <Button size="sm" variant="ghost" className="w-full h-8 text-xs hover:bg-destructive/10 hover:text-destructive" onClick={(e) => { e.stopPropagation(); handleReject(suggestion.id); }}>
                             <X className="w-3 h-3 mr-1" /> Отклонить
                           </Button>
                         </div>
@@ -481,8 +437,8 @@ const Editor = ({ onBack }: { onBack: () => void }) => {
                   
                   {results.filter(r => r.status === "pending").length === 0 && (
                      <div className="text-center py-12 opacity-50">
-                        <Check className="w-12 h-12 mx-auto mb-4 text-green-500" />
-                        <p className="text-sm">Все правки рассмотрены!</p>
+                        <Feather className="w-12 h-12 mx-auto mb-4 text-accent" />
+                        <p className="text-sm font-serif italic">Текст чист и благозвучен.</p>
                      </div>
                   )}
                 </div>
@@ -498,20 +454,16 @@ const Editor = ({ onBack }: { onBack: () => void }) => {
 // --- Main Page ---
 
 export default function Home() {
-  const [view, setView] = useState<"home" | "editor">("home");
   const [historyOpen, setHistoryOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
 
   return (
-    <div className="min-h-screen bg-background font-sans text-foreground flex flex-col selection:bg-primary/20">
+    <div className="min-h-screen bg-background font-sans text-foreground flex flex-col selection:bg-accent/20">
       <Navigation onHistoryClick={() => setHistoryOpen(true)} onSettingsClick={() => setSettingsOpen(true)} />
       
       <main className="flex-1 flex flex-col relative">
-        {view === "home" ? (
-           <EmptyState onStart={() => setView("editor")} />
-        ) : (
-           <Editor onBack={() => setView("home")} />
-        )}
+         {/* Directly render Editor, skipping EmptyState */}
+         <Editor onBack={() => {}} />
       </main>
       
       <HistoryDialog open={historyOpen} onOpenChange={setHistoryOpen} />
