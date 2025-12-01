@@ -1,0 +1,329 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@theme inline {
+  --font-sans: 'Inter', sans-serif;
+  --font-serif: 'Playfair Display', serif;
+  --font-body: 'Merriweather', serif;
+
+  /* Theme: "Classic Literature" - Ink, Parchment, Leather, Gold */
+  
+  --color-background: hsl(40 20% 98%); /* #FDFBF7 - Clean Parchment */
+  --color-foreground: hsl(215 40% 15%); /* #172133 - Deep Navy Ink */
+  
+  --color-card: hsl(0 0% 100%);
+  --color-card-foreground: hsl(215 40% 15%);
+  
+  --color-popover: hsl(0 0% 100%);
+  --color-popover-foreground: hsl(215 40% 15%);
+  
+  --color-primary: hsl(215 60% 35%); /* #234B8C - Royal Ink Blue */
+  --color-primary-foreground: hsl(0 0% 100%);
+  
+  --color-secondary: hsl(35 20% 92%); /* #F0EEE9 - Aged Paper */
+  --color-secondary-foreground: hsl(215 40% 15%);
+  
+  --color-muted: hsl(215 20% 95%);
+  --color-muted-foreground: hsl(215 20% 45%);
+  
+  --color-accent: hsl(35 40% 50%); /* #B28E3B - Antique Gold/Bronze */
+  --color-accent-foreground: hsl(0 0% 100%);
+  
+  --color-destructive: hsl(0 70% 40%); /* Deep Crimson */
+  --color-destructive-foreground: hsl(0 0% 98%);
+
+  --color-border: hsl(35 15% 85%);
+  --color-input: hsl(35 15% 85%);
+  --color-ring: hsl(215 60% 35%);
+  
+  --radius: 0.5rem;
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply font-sans antialiased bg-background text-foreground selection:bg-accent/20 selection:text-accent-foreground;
+    /* Subtle paper texture */
+    background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-serif tracking-tight;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+  
+  /* Custom Scrollbar for the editor feel */
+  .hide-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .hide-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  
+  /* Typography refinement */
+  .font-body {
+    font-family: var(--font-body);
+  }
+}
+
+/* Suggestions sidebar scrollbar */
+aside .overflow-y-auto::-webkit-scrollbar {
+  width: 6px;
+}
+
+aside .overflow-y-auto::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+aside .overflow-y-auto::-webkit-scrollbar-thumb {
+  background: hsl(215 20% 80%);
+  border-radius: 3px;
+}
+
+aside .overflow-y-auto::-webkit-scrollbar-thumb:hover {
+  background: hsl(215 20% 65%);
+}
+
+/* TipTap Editor Styles */
+.tiptap {
+  outline: none;
+}
+
+.tiptap p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  float: left;
+  color: hsl(215 20% 60%);
+  pointer-events: none;
+  height: 0;
+  font-style: italic;
+}
+
+.tiptap:focus {
+  outline: none;
+}
+
+/* Prose styles for TipTap */
+.tiptap.prose {
+  max-width: none;
+}
+
+.tiptap.prose h1 {
+  @apply text-3xl font-serif font-bold mb-4 mt-8 first:mt-0;
+}
+
+.tiptap.prose h2 {
+  @apply text-2xl font-serif font-bold mb-3 mt-6;
+}
+
+.tiptap.prose h3 {
+  @apply text-xl font-serif font-semibold mb-2 mt-5;
+}
+
+.tiptap.prose p {
+  @apply mb-4 leading-relaxed;
+}
+
+.tiptap.prose ul {
+  @apply list-disc pl-6 mb-4 space-y-1;
+}
+
+.tiptap.prose ol {
+  @apply list-decimal pl-6 mb-4 space-y-1;
+}
+
+.tiptap.prose li {
+  @apply leading-relaxed;
+}
+
+.tiptap.prose li p {
+  @apply mb-0;
+}
+
+.tiptap.prose blockquote {
+  @apply border-l-4 border-primary/30 pl-4 italic text-muted-foreground my-4;
+}
+
+.tiptap.prose code {
+  @apply bg-muted px-1.5 py-0.5 rounded text-sm font-mono;
+}
+
+.tiptap.prose pre {
+  @apply bg-muted p-4 rounded-lg overflow-x-auto my-4;
+}
+
+.tiptap.prose pre code {
+  @apply bg-transparent p-0;
+}
+
+.tiptap.prose hr {
+  @apply border-border my-8;
+}
+
+.tiptap.prose a {
+  @apply text-primary underline cursor-pointer hover:text-primary/80;
+}
+
+/* Highlight styles */
+.tiptap.prose mark {
+  @apply rounded px-0.5;
+}
+
+/* Suggestion highlight styles */
+.tiptap [data-suggestion-highlight] {
+  @apply transition-colors duration-150 cursor-pointer;
+}
+
+/* Style type - amber/yellow */
+.tiptap [data-suggestion-highlight][data-type="suggestion"][data-suggestion-type="style"] {
+  @apply bg-amber-100 underline decoration-wavy decoration-amber-400 decoration-1 underline-offset-2;
+}
+.tiptap [data-suggestion-highlight][data-type="suggestion"][data-suggestion-type="style"]:hover {
+  @apply bg-amber-200;
+}
+
+/* Tone type - blue */
+.tiptap [data-suggestion-highlight][data-type="suggestion"][data-suggestion-type="tone"] {
+  @apply bg-blue-100 underline decoration-wavy decoration-blue-400 decoration-1 underline-offset-2;
+}
+.tiptap [data-suggestion-highlight][data-type="suggestion"][data-suggestion-type="tone"]:hover {
+  @apply bg-blue-200;
+}
+
+/* Grammar type - green */
+.tiptap [data-suggestion-highlight][data-type="suggestion"][data-suggestion-type="grammar"] {
+  @apply bg-green-100 underline decoration-wavy decoration-green-400 decoration-1 underline-offset-2;
+}
+.tiptap [data-suggestion-highlight][data-type="suggestion"][data-suggestion-type="grammar"]:hover {
+  @apply bg-green-200;
+}
+
+/* Policy type - purple */
+.tiptap [data-suggestion-highlight][data-type="suggestion"][data-suggestion-type="policy"] {
+  @apply bg-purple-100 underline decoration-wavy decoration-purple-400 decoration-1 underline-offset-2;
+}
+.tiptap [data-suggestion-highlight][data-type="suggestion"][data-suggestion-type="policy"]:hover {
+  @apply bg-purple-200;
+}
+
+/* Default fallback for suggestion without type */
+.tiptap [data-suggestion-highlight][data-type="suggestion"]:not([data-suggestion-type]) {
+  @apply bg-amber-100 underline decoration-wavy decoration-amber-400 decoration-1 underline-offset-2;
+}
+.tiptap [data-suggestion-highlight][data-type="suggestion"]:not([data-suggestion-type]):hover {
+  @apply bg-amber-200;
+}
+
+.tiptap [data-suggestion-highlight][data-type="deletion"] {
+  @apply text-red-500 line-through decoration-red-400;
+}
+
+.tiptap [data-suggestion-highlight][data-type="insertion"] {
+  @apply text-emerald-600 font-medium;
+}
+
+/* Text alignment */
+.tiptap.prose [style*="text-align: center"] {
+  text-align: center;
+}
+
+.tiptap.prose [style*="text-align: right"] {
+  text-align: right;
+}
+
+/* Table styles */
+.tiptap.prose table {
+  @apply w-full border-collapse my-4 rounded-lg overflow-hidden;
+  border: 1px solid hsl(35 15% 85%);
+}
+
+.tiptap.prose th {
+  @apply bg-muted font-semibold text-left p-3;
+  border: 1px solid hsl(35 15% 85%);
+}
+
+.tiptap.prose td {
+  @apply p-3;
+  border: 1px solid hsl(35 15% 85%);
+}
+
+.tiptap.prose tr:hover {
+  @apply bg-muted/30;
+}
+
+.tiptap.prose th p,
+.tiptap.prose td p {
+  @apply mb-0;
+}
+
+/* Selected cell */
+.tiptap .selectedCell {
+  @apply bg-primary/10;
+}
+
+/* Table resize handles */
+.tiptap .tableWrapper {
+  @apply relative overflow-x-auto;
+}
+
+.tiptap .column-resize-handle {
+  @apply absolute top-0 right-0 w-1 h-full bg-primary/50 cursor-col-resize select-none;
+}
+
+.tiptap .resize-cursor {
+  cursor: col-resize;
+}
+
+/* Image styles */
+.tiptap.prose img {
+  @apply max-w-full h-auto rounded-lg my-4 shadow-sm;
+}
+
+.tiptap.prose img.ProseMirror-selectednode {
+  @apply ring-2 ring-primary ring-offset-2;
+}
+
+/* Figure styles */
+.figure-wrapper {
+  @apply relative;
+}
+
+.figure-wrapper[data-alignment="left"] figure {
+  @apply mr-auto;
+}
+
+.figure-wrapper[data-alignment="center"] figure {
+  @apply mx-auto;
+}
+
+.figure-wrapper[data-alignment="right"] figure {
+  @apply ml-auto;
+}
+
+.tiptap.prose figure {
+  @apply my-4 overflow-hidden rounded-lg border border-border;
+}
+
+.tiptap.prose figure img {
+  @apply my-0 rounded-none shadow-none;
+}
+
+.tiptap.prose figcaption {
+  @apply text-sm text-muted-foreground bg-muted/30 px-3 py-2 text-center;
+}
+
+/* YouTube embed styles */
+.tiptap.prose div[data-youtube-video] {
+  @apply my-4;
+}
+
+.tiptap.prose div[data-youtube-video] iframe {
+  @apply w-full aspect-video rounded-lg shadow-sm;
+}
