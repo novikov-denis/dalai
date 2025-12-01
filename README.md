@@ -23,12 +23,14 @@ npm install
 
 ### 2. Настройка переменных окружения
 
-Файл `.env` уже создан с ключом NeuroAPI:
+Создайте файл `.env` в корне проекта и укажите ваши ключи:
 
 ```env
-NEUROAPI_API_KEY=sk-zeZG5EtVdQXQAHL1gL27oq2EYJR3NosF8OV2kS6HjCu41ztv
+NEUROAPI_API_KEY=ваш_ключ_от_neuroapi
 NEUROAPI_BASE_URL=https://neuroapi.host/v1
 ```
+
+> ⚠️ **Никогда не коммитьте `.env` с реальными ключами!** Файл уже добавлен в `.gitignore`.
 
 ### 3. Запуск проекта
 
